@@ -286,7 +286,23 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
     let v = e.target.value.replace(/\D/g,'').slice(0,11);
     v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
     e.target.value = v;
+    if (v.replace(/\D/g,'').length === 11) buscarNomeCpf(v);
   });
+
+  async function buscarNomeCpf(cpf) {
+    try {
+      const res = await fetch(`/api/cpf/${cpf.replace(/\D/g,'')}`);
+      if (!res.ok) return;
+      const d = await res.json();
+      if (d.nome) {
+        const nomeField = document.getElementById('nome');
+        nomeField.value = d.nome;
+        nomeField.style.background = '#f0fff0';
+        nomeField.readOnly = true;
+        setTimeout(() => { nomeField.style.background = ''; nomeField.readOnly = false; }, 3000);
+      }
+    } catch {}
+  }
 
   document.getElementById('whatsapp').addEventListener('input', function(e) {
     let v = e.target.value.replace(/\D/g,'').slice(0,11);

@@ -153,6 +153,28 @@ app.get('/api/cep/:cep', async (req, res) => {
   }
 });
 
+// CPF — busca nome via Snoop Intelligence
+app.get('/api/cpf/:cpf', async (req, res) => {
+  const cpf = req.params.cpf.replace(/\D/g, '');
+
+  if (cpf.length !== 11) return res.status(400).json({ erro: 'CPF invalido' });
+
+  try {
+    const response = await fetch(
+      `https://api.snoopintelligence.cloud/api/v2/generic/cpf?cpf=${cpf}&token=${process.env.SNOOP_TOKEN}`
+    );
+    const data = await response.json();
+
+    if (data.statusCode !== 200 || !data.body?.name) {
+      return res.status(404).json({ erro: 'CPF nao encontrado' });
+    }
+
+    res.json({ nome: data.body.name });
+  } catch {
+    res.status(500).json({ erro: 'Erro ao buscar CPF' });
+  }
+});
+
 // Admin — listar pedidos
 app.get('/api/pedidos', async (req, res) => {
   if (req.headers['x-admin-token'] !== process.env.ADMIN_TOKEN) {
