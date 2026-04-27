@@ -61,6 +61,16 @@ app.get('/api/pedidos', async (req, res) => {
 });
 
 app.listen(PORT, async () => {
-  await initDB();
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Iniciando servidor na porta ${PORT}...`);
+  try {
+    await initDB();
+    console.log(`Servidor rodando na porta ${PORT}`);
+  } catch (err) {
+    console.error('Erro ao conectar no banco:', err.message);
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection:', err.message);
 });
