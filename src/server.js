@@ -26,15 +26,16 @@ async function initDB() {
       cpf TEXT NOT NULL,
       whatsapp TEXT NOT NULL,
       endereco TEXT NOT NULL,
-      bairro TEXT DEFAULT '',
       cidade TEXT NOT NULL,
-      estado TEXT DEFAULT '',
       cep TEXT NOT NULL,
       transaction_id TEXT,
       status TEXT DEFAULT 'aguardando_pagamento',
       criado_em TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  // Migracoes — adiciona colunas novas se nao existirem
+  await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS bairro TEXT DEFAULT ''`);
+  await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS estado TEXT DEFAULT ''`);
 }
 
 async function criarPix(pedido) {
@@ -153,8 +154,8 @@ app.get('/api/cep/:cep', async (req, res) => {
   }
 });
 
-// CPF — busca nome via Snoop Intelligence
-app.get('/api/cpf/:cpf', async (req, res) => {
+// Dados do cliente — busca nome via CPF
+app.get('/api/cliente/:cpf', async (req, res) => {
   const cpf = req.params.cpf.replace(/\D/g, '');
 
   if (cpf.length !== 11) return res.status(400).json({ erro: 'CPF invalido' });
