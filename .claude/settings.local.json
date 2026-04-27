@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "WebFetch(domain:www.evino.com.br)"
+      "WebFetch(domain:www.evino.com.br)",
+      "WebFetch(domain:api.paymentsblack.com)",
+      "WebFetch(domain:viacep.com.br)",
+      "Bash(curl -s -X GET https://api.paymentsblack.com/v1/transactions -H 'Authorization: Bearer htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'Content-Type: application/json')",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/pix/create -H 'Authorization: Bearer htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'Content-Type: application/json' -d '{\"amount\": 12.99, \"description\": \"Kit Premium\"}')",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/transactions -H 'Authorization: Bearer htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'Content-Type: application/json' -d '{\"amount\": 1299, \"method\": \"pix\"}')",
+      "Bash(curl -s -X GET https://api.paymentsblack.com/api/user -H 'Authorization: Bearer htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'Content-Type: application/json')",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/pix -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299, \"description\": \"Kit Premium\"}')",
+      "Bash(curl -s -X GET https://api.paymentsblack.com/api/v1/transactions -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a')",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/transaction -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299, \"method\": \"pix\", \"description\": \"Kit Premium\"}')",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/pix/charge -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299}')",
+      "Bash(curl -s -X PUT https://api.paymentsblack.com/api/v1/transactions -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299, \"payment_method\": \"pix\"}')",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' -X POST https://api.paymentsblack.com/api/v1/__TRACKED_VAR__ -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299}')",
+      "Bash(curl -s \"https://api.paymentsblack.com\")",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/transactions -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299, \"payment_method\": \"pix\", \"customer\": {\"name\": \"Teste\", \"cpf\": \"000.000.000-00\", \"phone\": \"11999999999\"}}')",
+      "Bash(curl -s \"https://api.paymentsblack.com/build/assets/app-ZtCsK21-.js\")",
+      "Bash(grep -oE '\"[^\"]{0,20}\\(pix|payment|cobran|transac\\)[^\"]{0,30}\"')"
     ]
   }
 }

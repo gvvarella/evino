@@ -73,8 +73,26 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
 .garantia{text-align:center;font-size:11px;color:#777;}
 .garantia-icon{font-size:20px;display:block;margin-bottom:3px;}
 
-.msg-sucesso{display:none;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;padding:16px;border-radius:8px;margin-top:12px;text-align:center;font-size:14px;}
 .msg-erro{display:none;background:#ffebee;color:#c62828;border:1px solid #ef9a9a;padding:16px;border-radius:8px;margin-top:12px;text-align:center;font-size:14px;}
+
+/* TELA PIX */
+.pix-screen{display:none;background:#fff;}
+.pix-box{background:#f8f9fa;border:1px solid #eee;border-radius:12px;padding:24px;text-align:center;margin-bottom:16px;}
+.pix-box h3{font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:6px;}
+.pix-box p{font-size:13px;color:#777;margin-bottom:16px;}
+.pix-qrcode{width:200px;height:200px;margin:0 auto 16px;}
+.pix-qrcode img{width:100%;border-radius:8px;}
+.pix-valor{font-size:28px;font-weight:900;color:#8B0000;margin-bottom:16px;}
+.pix-copia{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:11px;color:#555;word-break:break-all;text-align:left;margin-bottom:12px;max-height:80px;overflow:hidden;}
+.btn-copiar{width:100%;padding:14px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;transition:background .2s;}
+.btn-copiar:hover{background:#333;}
+.btn-copiar.copiado{background:#2e7d32;}
+.pix-status{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:#777;margin-top:8px;}
+.pix-status-dot{width:10px;height:10px;border-radius:50%;background:#ffc107;animation:pulse 1.5s infinite;}
+.pix-status-dot.pago{background:#2e7d32;animation:none;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.pix-pago{display:none;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;padding:20px;border-radius:10px;text-align:center;font-size:16px;font-weight:700;}
+.pix-timer{font-size:12px;color:#999;margin-top:6px;}
 
 /* KIT CONTENTS */
 .kit-section{margin-top:50px;border-top:1px solid #eee;padding-top:40px;}
@@ -161,19 +179,44 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
 
       <div class="form-titulo">Preencha para finalizar seu pedido</div>
       <form id="formCheckout">
-        <div class="form-grupo"><input id="nome" placeholder="Nome completo" required></div>
-        <div class="form-grupo"><input id="cpf" placeholder="CPF" maxlength="14" required></div>
-        <div class="form-grupo"><input id="whatsapp" placeholder="WhatsApp" maxlength="15" required></div>
-        <div class="form-grupo"><input id="endereco" placeholder="Endereço completo" required></div>
         <div class="form-row">
-          <div class="form-grupo"><input id="cidade" placeholder="Cidade" required></div>
-          <div class="form-grupo"><input id="cep" placeholder="CEP" maxlength="9" required></div>
+          <div class="form-grupo" style="flex:0 0 140px">
+            <input id="cep" placeholder="CEP" maxlength="9" required>
+          </div>
+          <div class="form-grupo">
+            <input id="bairro" placeholder="Bairro" readonly style="background:#f9f9f9">
+          </div>
         </div>
+        <div class="form-grupo"><input id="endereco" placeholder="Endereço (preenchido pelo CEP)" required></div>
+        <div class="form-row">
+          <div class="form-grupo"><input id="cidade" placeholder="Cidade" readonly style="background:#f9f9f9" required></div>
+          <div class="form-grupo" style="flex:0 0 60px"><input id="estado" placeholder="UF" readonly style="background:#f9f9f9"></div>
+        </div>
+        <div class="form-grupo"><input id="cpf" placeholder="CPF" maxlength="14" required></div>
+        <div class="form-grupo"><input id="nome" placeholder="Nome completo" required></div>
+        <div class="form-grupo"><input id="whatsapp" placeholder="WhatsApp" maxlength="15" required></div>
         <button class="btn-comprar" type="submit" id="btnFinalizar">FINALIZAR PEDIDO COM PIX</button>
       </form>
 
-      <div class="msg-sucesso" id="msgSucesso">✅ Pedido recebido! Em breve você receberá as instruções de pagamento via WhatsApp.</div>
-      <div class="msg-erro" id="msgErro">❌ Erro ao enviar. Tente novamente.</div>
+      <!-- TELA PIX -->
+      <div class="pix-screen" id="pixScreen">
+        <div class="pix-pago" id="pixPago">✅ Pagamento confirmado! Seu pedido está sendo processado.</div>
+        <div class="pix-box" id="pixBox">
+          <h3>Pague com PIX</h3>
+          <p>Escaneie o QR Code ou copie o código abaixo</p>
+          <div class="pix-valor" id="pixValor">R$ 12,99</div>
+          <div class="pix-qrcode"><img id="pixQrcode" src="" alt="QR Code PIX"></div>
+          <div class="pix-copia" id="pixCopia"></div>
+          <button class="btn-copiar" id="btnCopiar" onclick="copiarPix()">📋 Copiar código PIX</button>
+          <div class="pix-timer" id="pixTimer">Aguardando pagamento...</div>
+          <div class="pix-status">
+            <div class="pix-status-dot" id="statusDot"></div>
+            <span id="statusTexto">Aguardando pagamento</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg-erro" id="msgErro">❌ Erro ao processar. Tente novamente.</div>
 
       <div class="garantias">
         <div class="garantia"><span class="garantia-icon">🔒</span>Pagamento seguro</div>
@@ -235,18 +278,19 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
 </footer>
 
 <script>
+  let pixCopiaCola = '';
+  let pollingInterval = null;
+
+  // Máscaras
   document.getElementById('cpf').addEventListener('input', function(e) {
     let v = e.target.value.replace(/\D/g,'').slice(0,11);
-    v = v.replace(/(\d{3})(\d)/,'$1.$2');
-    v = v.replace(/(\d{3})(\d)/,'$1.$2');
-    v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
     e.target.value = v;
   });
 
   document.getElementById('whatsapp').addEventListener('input', function(e) {
     let v = e.target.value.replace(/\D/g,'').slice(0,11);
-    v = v.replace(/^(\d{2})(\d)/,'($1) $2');
-    v = v.replace(/(\d{5})(\d{1,4})$/,'$1-$2');
+    v = v.replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{1,4})$/,'$1-$2');
     e.target.value = v;
   });
 
@@ -254,21 +298,75 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
     let v = e.target.value.replace(/\D/g,'').slice(0,8);
     v = v.replace(/(\d{5})(\d)/,'$1-$2');
     e.target.value = v;
+    if (v.replace(/\D/g,'').length === 8) buscarCep(v);
   });
 
+  // Auto-fill CEP
+  async function buscarCep(cep) {
+    try {
+      const res = await fetch(`/api/cep/${cep.replace(/\D/g,'')}`);
+      if (!res.ok) return;
+      const d = await res.json();
+      if (d.logradouro) document.getElementById('endereco').value = d.logradouro;
+      if (d.bairro)     document.getElementById('bairro').value   = d.bairro;
+      if (d.cidade)     document.getElementById('cidade').value   = d.cidade;
+      if (d.estado)     document.getElementById('estado').value   = d.estado;
+    } catch {}
+  }
+
+  // Copiar PIX
+  function copiarPix() {
+    navigator.clipboard.writeText(pixCopiaCola).then(() => {
+      const btn = document.getElementById('btnCopiar');
+      btn.textContent = '✅ Código copiado!';
+      btn.classList.add('copiado');
+      setTimeout(() => { btn.textContent = '📋 Copiar código PIX'; btn.classList.remove('copiado'); }, 3000);
+    });
+  }
+
+  // Polling status pagamento
+  function iniciarPolling(transactionId) {
+    let tentativas = 0;
+    pollingInterval = setInterval(async () => {
+      tentativas++;
+      try {
+        const res = await fetch(`/api/checkout/${transactionId}/status`);
+        const d = await res.json();
+
+        if (d.status === 'COMPLETED') {
+          clearInterval(pollingInterval);
+          document.getElementById('pixBox').style.display = 'none';
+          document.getElementById('pixPago').style.display = 'block';
+          document.getElementById('statusDot').classList.add('pago');
+        } else if (d.status === 'REJECTED' || d.status === 'CANCELLED') {
+          clearInterval(pollingInterval);
+          document.getElementById('statusTexto').textContent = 'Pagamento recusado';
+          document.getElementById('pixTimer').textContent = 'O pagamento foi cancelado.';
+        }
+
+        // Timeout 15 min
+        if (tentativas >= 180) clearInterval(pollingInterval);
+      } catch {}
+    }, 5000);
+  }
+
+  // Submit
   document.getElementById('formCheckout').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnFinalizar');
     btn.disabled = true;
-    btn.textContent = 'Processando...';
+    btn.textContent = 'Gerando PIX...';
+    document.getElementById('msgErro').style.display = 'none';
 
     const dados = {
-      nome: document.getElementById('nome').value,
-      cpf: document.getElementById('cpf').value,
+      nome:     document.getElementById('nome').value,
+      cpf:      document.getElementById('cpf').value,
       whatsapp: document.getElementById('whatsapp').value,
       endereco: document.getElementById('endereco').value,
-      cidade: document.getElementById('cidade').value,
-      cep: document.getElementById('cep').value,
+      bairro:   document.getElementById('bairro').value,
+      cidade:   document.getElementById('cidade').value,
+      estado:   document.getElementById('estado').value,
+      cep:      document.getElementById('cep').value,
     };
 
     try {
@@ -277,12 +375,22 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify(dados)
       });
-      if (res.ok) {
-        document.getElementById('formCheckout').style.display = 'none';
-        document.getElementById('msgSucesso').style.display = 'block';
-      } else { throw new Error(); }
-    } catch {
+      const d = await res.json();
+
+      if (!res.ok || !d.sucesso) throw new Error(d.erro || 'Erro');
+
+      // Mostrar tela PIX
+      document.getElementById('formCheckout').style.display = 'none';
+      document.getElementById('pixScreen').style.display = 'block';
+      document.getElementById('pixQrcode').src = d.qrcode;
+      document.getElementById('pixCopia').textContent = d.copiaecola;
+      document.getElementById('pixValor').textContent = `R$ ${parseFloat(d.amount).toFixed(2).replace('.',',')}`;
+      pixCopiaCola = d.copiaecola;
+
+      iniciarPolling(d.transaction_id);
+    } catch(err) {
       document.getElementById('msgErro').style.display = 'block';
+      document.getElementById('msgErro').textContent = '❌ ' + (err.message || 'Erro ao processar. Tente novamente.');
       btn.disabled = false;
       btn.textContent = 'FINALIZAR PEDIDO COM PIX';
     }
