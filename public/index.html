@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EVINO VIP | Kit Premium</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:#0e0e0e;color:#fff;}
+
+.header{display:flex;justify-content:space-between;align-items:center;padding:20px 30px;border-bottom:1px solid #222;}
+.logo{font-weight:bold;font-size:20px;}
+.secure{font-size:14px;opacity:.8;}
+
+.container{max-width:1100px;margin:auto;padding:30px;}
+.hero{display:flex;flex-wrap:wrap;gap:40px;align-items:center;}
+
+.produto{flex:1;min-width:300px;}
+.produto img{width:100%;border-radius:20px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
+.rating{margin-bottom:10px;color:#ffcc00;}
+h1{font-size:46px;margin-bottom:15px;}
+.sub{opacity:.8;margin-bottom:20px;}
+.box{background:#161616;padding:20px;border-radius:15px;margin-bottom:20px;border:1px solid #222;}
+.preco{font-size:48px;font-weight:bold;margin:20px 0;}
+.preco span{text-decoration:line-through;font-size:20px;display:block;opacity:.6;}
+.urgencia{color:#ff3b3b;font-size:14px;margin-top:10px;}
+
+.form-area{flex:1;min-width:320px;background:#fff;color:#111;padding:30px;border-radius:20px;}
+.form-area h2{margin-bottom:20px;}
+input{width:100%;padding:15px;margin-bottom:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;}
+input:focus{outline:none;border-color:#ff2d2d;}
+button{width:100%;padding:18px;border:none;background:#ff2d2d;color:#fff;font-size:18px;font-weight:bold;border-radius:12px;cursor:pointer;transition:background .2s;}
+button:hover{background:#cc0000;}
+button:disabled{background:#aaa;cursor:not-allowed;}
+.badges{display:flex;justify-content:space-around;margin-top:15px;font-size:13px;color:#555;}
+
+.msg-sucesso{display:none;background:#e6ffe6;color:#1a7a1a;border:1px solid #99dd99;padding:15px;border-radius:10px;margin-top:15px;text-align:center;}
+.msg-erro{display:none;background:#ffe6e6;color:#cc0000;border:1px solid #ffaaaa;padding:15px;border-radius:10px;margin-top:15px;text-align:center;}
+
+.reviews{margin-top:40px;}
+.review{background:#161616;padding:15px;border-radius:10px;margin-bottom:10px;}
+
+@media(max-width:900px){h1{font-size:34px;}.preco{font-size:38px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">EVINO VIP</div>
+  <div class="secure">🔒 Compra 100% Segura</div>
+</div>
+
+<div class="container">
+  <div class="hero">
+
+    <div class="produto">
+      <img src="/imagens/kit.png" alt="Kit Premium Bolsa + Taças">
+      <div class="rating">⭐⭐⭐⭐⭐ +3.742 clientes satisfeitos</div>
+      <h1>Kit Premium Bolsa + 6 Taças</h1>
+      <p class="sub">Oferta exclusiva válida apenas hoje.</p>
+      <div class="box">
+        ✔ Bolsa de couro premium<br>
+        ✔ 6 Taças acrílicas (GRÁTIS)<br>
+        ✔ Frete para todo Brasil
+      </div>
+      <div class="preco">
+        <span>De R$249,90</span>
+        R$12,99
+      </div>
+      <div class="urgencia">⚠️ Restam apenas 12 unidades</div>
+    </div>
+
+    <div class="form-area">
+      <h2>Finalizar Pedido</h2>
+      <form id="formCheckout">
+        <input id="nome" placeholder="Nome completo" required>
+        <input id="cpf" placeholder="CPF" maxlength="14" required>
+        <input id="whatsapp" placeholder="WhatsApp" maxlength="15" required>
+        <input id="endereco" placeholder="Endereço completo" required>
+        <input id="cidade" placeholder="Cidade" required>
+        <input id="cep" placeholder="CEP" maxlength="9" required>
+        <button type="submit" id="btnFinalizar">FINALIZAR COM PIX</button>
+      </form>
+      <div class="msg-sucesso" id="msgSucesso">✅ Pedido recebido! Em breve você receberá as instruções de pagamento no WhatsApp.</div>
+      <div class="msg-erro" id="msgErro">❌ Erro ao enviar. Tente novamente.</div>
+      <div class="badges">
+        <span>🔒 Seguro</span>
+        <span>🚚 Envio rápido</span>
+        <span>📦 Garantia</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="reviews">
+    <h2>O que nossos clientes dizem</h2>
+    <div class="review">"Chegou muito rápido, qualidade top!" - Ana</div>
+    <div class="review">"Vale muito mais que o preço" - Carlos</div>
+    <div class="review">"Comprei 2 kits, recomendo!" - Juliana</div>
+  </div>
+</div>
+
+<script>
+  // Máscara CPF
+  document.getElementById('cpf').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = v;
+  });
+
+  // Máscara WhatsApp
+  document.getElementById('whatsapp').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+    v = v.replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+    e.target.value = v;
+  });
+
+  // Máscara CEP
+  document.getElementById('cep').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+    v = v.replace(/(\d{5})(\d)/, '$1-$2');
+    e.target.value = v;
+  });
+
+  // Submit
+  document.getElementById('formCheckout').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnFinalizar');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const dados = {
+      nome: document.getElementById('nome').value,
+      cpf: document.getElementById('cpf').value,
+      whatsapp: document.getElementById('whatsapp').value,
+      endereco: document.getElementById('endereco').value,
+      cidade: document.getElementById('cidade').value,
+      cep: document.getElementById('cep').value,
+    };
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+
+      if (res.ok) {
+        document.getElementById('formCheckout').style.display = 'none';
+        document.getElementById('msgSucesso').style.display = 'block';
+      } else {
+        throw new Error();
+      }
+    } catch {
+      document.getElementById('msgErro').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'FINALIZAR COM PIX';
+    }
+  });
+</script>
+
+</body>
+</html>
