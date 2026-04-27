@@ -36,6 +36,7 @@ async function initDB() {
   // Migracoes — adiciona colunas novas se nao existirem
   await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS bairro TEXT DEFAULT ''`);
   await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS estado TEXT DEFAULT ''`);
+  await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS numero TEXT DEFAULT ''`);
 }
 
 async function criarPix(pedido) {
@@ -70,9 +71,9 @@ async function criarPix(pedido) {
 
 // Checkout — cria PIX e salva pedido
 app.post('/api/checkout', async (req, res) => {
-  const { nome, cpf, whatsapp, endereco, bairro, cidade, estado, cep } = req.body;
+  const { nome, cpf, whatsapp, endereco, numero, bairro, cidade, estado, cep } = req.body;
 
-  if (!nome || !cpf || !whatsapp || !endereco || !cidade || !cep) {
+  if (!nome || !cpf || !whatsapp || !endereco || !numero || !cidade || !cep) {
     return res.status(400).json({ erro: 'Preencha todos os campos obrigatorios.' });
   }
 
@@ -87,9 +88,9 @@ app.post('/api/checkout', async (req, res) => {
     const { transactionId, copiaecola, qrcode, amount } = pixResp.paymentData;
 
     const result = await pool.query(
-      `INSERT INTO pedidos (nome, cpf, whatsapp, endereco, bairro, cidade, estado, cep, transaction_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
-      [nome, cpf, whatsapp, endereco, bairro || '', cidade, estado || '', cep, transactionId]
+      `INSERT INTO pedidos (nome, cpf, whatsapp, endereco, numero, bairro, cidade, estado, cep, transaction_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`,
+      [nome, cpf, whatsapp, endereco, numero, bairro || '', cidade, estado || '', cep, transactionId]
     );
 
     res.json({ sucesso: true, pedido_id: result.rows[0].id, transaction_id: transactionId, qrcode, copiaecola, amount });

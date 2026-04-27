@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kit Premium Bolsa + Taças | Brinde VIP Evino</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a;}
@@ -187,7 +188,10 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
             <input id="bairro" placeholder="Bairro" readonly style="background:#f9f9f9">
           </div>
         </div>
-        <div class="form-grupo"><input id="endereco" placeholder="Endereço (preenchido pelo CEP)" required></div>
+        <div class="form-row">
+          <div class="form-grupo"><input id="endereco" placeholder="Endereço (preenchido pelo CEP)" required></div>
+          <div class="form-grupo" style="flex:0 0 90px"><input id="numero" placeholder="Nº" required></div>
+        </div>
         <div class="form-row">
           <div class="form-grupo"><input id="cidade" placeholder="Cidade" readonly style="background:#f9f9f9" required></div>
           <div class="form-grupo" style="flex:0 0 60px"><input id="estado" placeholder="UF" readonly style="background:#f9f9f9"></div>
@@ -291,7 +295,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
 
   async function buscarNomeCpf(cpf) {
     try {
-      const res = await fetch(`/api/cpf/${cpf.replace(/\D/g,'')}`);
+      const res = await fetch(`/api/cliente/${cpf.replace(/\D/g,'')}`);
       if (!res.ok) return;
       const d = await res.json();
       if (d.nome) {
@@ -379,6 +383,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
       cpf:      document.getElementById('cpf').value,
       whatsapp: document.getElementById('whatsapp').value,
       endereco: document.getElementById('endereco').value,
+      numero:   document.getElementById('numero').value,
       bairro:   document.getElementById('bairro').value,
       cidade:   document.getElementById('cidade').value,
       estado:   document.getElementById('estado').value,

@@ -19,7 +19,10 @@
       "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/transactions -H 'x-api-key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'x-api-secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -H 'Content-Type: application/json' -d '{\"amount\": 1299, \"payment_method\": \"pix\", \"customer\": {\"name\": \"Teste\", \"cpf\": \"000.000.000-00\", \"phone\": \"11999999999\"}}')",
       "Bash(curl -s \"https://api.paymentsblack.com/build/assets/app-ZtCsK21-.js\")",
       "Bash(grep -oE '\"[^\"]{0,20}\\(pix|payment|cobran|transac\\)[^\"]{0,30}\"')",
-      "Bash(curl -s \"https://api.snoopintelligence.cloud/api/v2/generic/cpf?cpf=12345678900&token=snoop-a7b4e6c8c297850a447ce2118b396874-2026\")"
+      "Bash(curl -s \"https://api.snoopintelligence.cloud/api/v2/generic/cpf?cpf=12345678900&token=snoop-a7b4e6c8c297850a447ce2118b396874-2026\")",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/pix/create -H 'Content-Type: application/json' -H 'X-API-Key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'X-API-Secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -d '{ *)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -X POST https://api.paymentsblack.com/api/v1/pix/create -H 'Content-Type: application/json' -H 'X-API-Key: htus_c72aa50f6b4e3f2eda93a88eaf5dfc41' -H 'X-API-Secret: 5498b2146d8ecdaa7fe906f7cf3f75890b154648fd8e23c0bf49db276334795a' -d '{\"amount\":12.99,\"description\":\"Kit Premium\",\"customer\":{\"name\":\"Teste Silva\",\"email\":\"teste@teste.com\",\"phone\":\"11999999999\",\"document\":{\"number\":\"36158334812\",\"type\":\"cpf\"}},\"items\":[{\"title\":\"Kit Premium\",\"unitPrice\":1299,\"quantity\":1}],\"postbackUrl\":\"https://brindevipevino.com.br/api/webhook/pix\"}')"
     ]
   }
 }
