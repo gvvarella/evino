@@ -14,6 +14,9 @@ const PAYMENTSBLACK_API = 'https://api.paymentsblack.com';
 const API_KEY = process.env.PAYMENTSBLACK_API_KEY;
 const API_SECRET = process.env.PAYMENTSBLACK_API_SECRET;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const EMAIL_ADMIN = process.env.EMAIL_ADMIN;
+const EMAIL_FROM = process.env.EMAIL_FROM || 'pedidos@brindevipevino.com.br';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
@@ -37,6 +40,79 @@ async function initDB() {
   await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS bairro TEXT DEFAULT ''`);
   await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS estado TEXT DEFAULT ''`);
   await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS numero TEXT DEFAULT ''`);
+  await pool.query(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS email TEXT DEFAULT ''`);
+}
+
+async function enviarEmail({ to, subject, html }) {
+  if (!RESEND_API_KEY) return;
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: EMAIL_FROM, to, subject, html }),
+    });
+  } catch (err) {
+    console.error('Erro ao enviar email:', err.message);
+  }
+}
+
+async function notificarPagamento(pedido) {
+  // Email para o cliente
+  await enviarEmail({
+    to: pedido.email || EMAIL_ADMIN,
+    subject: '✅ Pedido confirmado - Kit Premium Bolsa + 6 Taças',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+        <div style="background:#8B0000;padding:20px;text-align:center;border-radius:8px 8px 0 0;">
+          <h1 style="color:#fff;margin:0;font-size:24px;">✅ Pagamento Confirmado!</h1>
+        </div>
+        <div style="background:#f9f9f9;padding:30px;border-radius:0 0 8px 8px;border:1px solid #eee;">
+          <p style="font-size:16px;color:#333;">Olá, <strong>${pedido.nome}</strong>!</p>
+          <p style="color:#555;">Seu pagamento foi confirmado com sucesso. Seu pedido está sendo preparado.</p>
+          <div style="background:#fff;border:1px solid #eee;border-radius:8px;padding:20px;margin:20px 0;">
+            <h3 style="color:#8B0000;margin:0 0 15px;">📦 Resumo do Pedido</h3>
+            <table style="width:100%;font-size:14px;color:#555;">
+              <tr><td><strong>Produto:</strong></td><td>Kit Premium Bolsa + 6 Taças Acrílicas</td></tr>
+              <tr><td><strong>Valor:</strong></td><td style="color:#8B0000;font-weight:bold;">R$ 12,99</td></tr>
+              <tr><td><strong>Entrega:</strong></td><td>${pedido.endereco}, ${pedido.numero} - ${pedido.bairro}, ${pedido.cidade}/${pedido.estado} - CEP: ${pedido.cep}</td></tr>
+              <tr><td><strong>WhatsApp:</strong></td><td>${pedido.whatsapp}</td></tr>
+            </table>
+          </div>
+          <p style="color:#555;font-size:14px;">Em breve entraremos em contato pelo WhatsApp <strong>${pedido.whatsapp}</strong> com o código de rastreio.</p>
+          <p style="color:#999;font-size:12px;margin-top:30px;">Dúvidas? Responda este e-mail ou entre em contato pelo WhatsApp.</p>
+        </div>
+      </div>
+    `,
+  });
+
+  // Email de notificação para o admin
+  await enviarEmail({
+    to: EMAIL_ADMIN,
+    subject: `🛒 Nova venda! ${pedido.nome} - R$ 12,99`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+        <div style="background:#1a1a1a;padding:20px;text-align:center;border-radius:8px 8px 0 0;">
+          <h1 style="color:#fff;margin:0;font-size:22px;">🛒 Nova Venda Confirmada!</h1>
+        </div>
+        <div style="background:#f9f9f9;padding:30px;border-radius:0 0 8px 8px;border:1px solid #eee;">
+          <table style="width:100%;font-size:14px;color:#555;border-collapse:collapse;">
+            <tr style="background:#eee;"><td colspan="2" style="padding:8px;font-weight:bold;">Dados do Cliente</td></tr>
+            <tr><td style="padding:6px;"><strong>Nome:</strong></td><td>${pedido.nome}</td></tr>
+            <tr><td style="padding:6px;"><strong>CPF:</strong></td><td>${pedido.cpf}</td></tr>
+            <tr><td style="padding:6px;"><strong>WhatsApp:</strong></td><td>${pedido.whatsapp}</td></tr>
+            <tr><td style="padding:6px;"><strong>Endereço:</strong></td><td>${pedido.endereco}, ${pedido.numero} - ${pedido.bairro}</td></tr>
+            <tr><td style="padding:6px;"><strong>Cidade/UF:</strong></td><td>${pedido.cidade}/${pedido.estado}</td></tr>
+            <tr><td style="padding:6px;"><strong>CEP:</strong></td><td>${pedido.cep}</td></tr>
+            <tr style="background:#e8f5e9;"><td style="padding:8px;"><strong>Valor:</strong></td><td style="color:#2e7d32;font-weight:bold;">R$ 12,99</td></tr>
+            <tr><td style="padding:6px;"><strong>Transaction ID:</strong></td><td style="font-size:12px;">${pedido.transaction_id}</td></tr>
+          </table>
+        </div>
+      </div>
+    `,
+  });
 }
 
 async function criarPix(pedido) {
@@ -45,7 +121,7 @@ async function criarPix(pedido) {
     description: 'Kit Premium Bolsa + 6 Tacas',
     customer: {
       name: pedido.nome,
-      email: `${pedido.cpf.replace(/\D/g, '')}@brindevipevino.com.br`,
+      email: pedido.email,
       phone: pedido.whatsapp.replace(/\D/g, ''),
       document: {
         number: pedido.cpf.replace(/\D/g, ''),
@@ -71,9 +147,9 @@ async function criarPix(pedido) {
 
 // Checkout — cria PIX e salva pedido
 app.post('/api/checkout', async (req, res) => {
-  const { nome, cpf, whatsapp, endereco, numero, bairro, cidade, estado, cep } = req.body;
+  const { nome, cpf, email, whatsapp, endereco, numero, bairro, cidade, estado, cep } = req.body;
 
-  if (!nome || !cpf || !whatsapp || !endereco || !numero || !cidade || !cep) {
+  if (!nome || !cpf || !email || !whatsapp || !endereco || !numero || !cidade || !cep) {
     return res.status(400).json({ erro: 'Preencha todos os campos obrigatorios.' });
   }
 
@@ -88,9 +164,9 @@ app.post('/api/checkout', async (req, res) => {
     const { transactionId, copiaecola, qrcode, amount } = pixResp.paymentData;
 
     const result = await pool.query(
-      `INSERT INTO pedidos (nome, cpf, whatsapp, endereco, numero, bairro, cidade, estado, cep, transaction_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`,
-      [nome, cpf, whatsapp, endereco, numero, bairro || '', cidade, estado || '', cep, transactionId]
+      `INSERT INTO pedidos (nome, cpf, email, whatsapp, endereco, numero, bairro, cidade, estado, cep, transaction_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`,
+      [nome, cpf, email, whatsapp, endereco, numero, bairro || '', cidade, estado || '', cep, transactionId]
     );
 
     res.json({ sucesso: true, pedido_id: result.rows[0].id, transaction_id: transactionId, qrcode, copiaecola, amount });
@@ -112,7 +188,11 @@ app.get('/api/checkout/:transactionId/status', async (req, res) => {
     const status = data.data?.status || 'PENDING';
 
     if (status === 'COMPLETED') {
-      await pool.query('UPDATE pedidos SET status=$1 WHERE transaction_id=$2', ['pago', transactionId]);
+      const upd = await pool.query(
+        'UPDATE pedidos SET status=$1 WHERE transaction_id=$2 AND status != $1 RETURNING *',
+        ['pago', transactionId]
+      );
+      if (upd.rows.length > 0) await notificarPagamento(upd.rows[0]);
     }
 
     res.json({ status });
@@ -128,7 +208,13 @@ app.post('/api/webhook/pix', async (req, res) => {
 
   try {
     if (transaction_id && status) {
-      await pool.query('UPDATE pedidos SET status=$1 WHERE transaction_id=$2', [status.toLowerCase(), transaction_id]);
+      const upd = await pool.query(
+        'UPDATE pedidos SET status=$1 WHERE transaction_id=$2 AND status != $1 RETURNING *',
+        [status.toLowerCase(), transaction_id]
+      );
+      if (status === 'COMPLETED' && upd.rows.length > 0) {
+        await notificarPagamento(upd.rows[0]);
+      }
     }
   } catch (err) {
     console.error('Webhook erro:', err.message);

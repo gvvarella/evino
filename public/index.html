@@ -92,7 +92,21 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
 .pix-status-dot{width:10px;height:10px;border-radius:50%;background:#ffc107;animation:pulse 1.5s infinite;}
 .pix-status-dot.pago{background:#2e7d32;animation:none;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.pix-pago{display:none;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;padding:20px;border-radius:10px;text-align:center;font-size:16px;font-weight:700;}
+.pix-pago{display:none;}
+.obrigado{background:#fff;border-radius:12px;text-align:center;padding:30px 20px;}
+.obrigado-icon{font-size:60px;margin-bottom:16px;}
+.obrigado h2{font-size:24px;font-weight:900;color:#2e7d32;margin-bottom:8px;}
+.obrigado p{font-size:14px;color:#555;margin-bottom:20px;}
+.obrigado-box{background:#f8f9fa;border:1px solid #eee;border-radius:10px;padding:20px;text-align:left;margin-bottom:20px;}
+.obrigado-box h4{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee;}
+.obrigado-row{display:flex;justify-content:space-between;font-size:13px;color:#555;padding:5px 0;border-bottom:1px solid #f0f0f0;}
+.obrigado-row:last-child{border:none;}
+.obrigado-row span:last-child{font-weight:600;color:#1a1a1a;text-align:right;}
+.obrigado-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.obrigado-step{display:flex;align-items:center;gap:12px;background:#f8f9fa;border-radius:8px;padding:12px;}
+.obrigado-step-icon{font-size:22px;}
+.obrigado-step-text{font-size:13px;color:#555;text-align:left;}
+.obrigado-step-text strong{display:block;color:#1a1a1a;font-size:14px;}
 .pix-timer{font-size:12px;color:#999;margin-top:6px;}
 
 /* KIT CONTENTS */
@@ -198,13 +212,14 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
         </div>
         <div class="form-grupo"><input id="cpf" placeholder="CPF" maxlength="14" required></div>
         <div class="form-grupo"><input id="nome" placeholder="Nome completo" required></div>
+        <div class="form-grupo"><input id="email" type="email" placeholder="E-mail para confirmação" required></div>
         <div class="form-grupo"><input id="whatsapp" placeholder="WhatsApp" maxlength="15" required></div>
         <button class="btn-comprar" type="submit" id="btnFinalizar">FINALIZAR PEDIDO COM PIX</button>
       </form>
 
       <!-- TELA PIX -->
       <div class="pix-screen" id="pixScreen">
-        <div class="pix-pago" id="pixPago">✅ Pagamento confirmado! Seu pedido está sendo processado.</div>
+        <div class="pix-pago" id="pixPago"></div>
         <div class="pix-box" id="pixBox">
           <h3>Pague com PIX</h3>
           <p>Escaneie o QR Code ou copie o código abaixo</p>
@@ -334,6 +349,76 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
     } catch {}
   }
 
+  // Página de obrigado
+  function mostrarObrigado() {
+    const dados = {
+      nome:     document.getElementById('nome').value,
+      email:    document.getElementById('email').value,
+      whatsapp: document.getElementById('whatsapp').value,
+      endereco: document.getElementById('endereco').value,
+      numero:   document.getElementById('numero').value,
+      bairro:   document.getElementById('bairro').value,
+      cidade:   document.getElementById('cidade').value,
+      estado:   document.getElementById('estado').value,
+      cep:      document.getElementById('cep').value,
+    };
+
+    const pixPago = document.getElementById('pixPago');
+    pixPago.style.display = 'block';
+    pixPago.innerHTML = `
+      <div class="obrigado">
+        <div class="obrigado-icon">🎉</div>
+        <h2>Pagamento Confirmado!</h2>
+        <p>Obrigado pela compra, <strong>${dados.nome.split(' ')[0]}</strong>!<br>
+        Uma confirmação foi enviada para <strong>${dados.email}</strong>.</p>
+
+        <div class="obrigado-box">
+          <h4>📦 Resumo do Pedido</h4>
+          <div class="obrigado-row"><span>Produto</span><span>Kit Premium Bolsa + 6 Taças</span></div>
+          <div class="obrigado-row"><span>Valor pago</span><span style="color:#2e7d32">R$ 12,99</span></div>
+          <div class="obrigado-row"><span>Entrega</span><span>${dados.endereco}, ${dados.numero}</span></div>
+          <div class="obrigado-row"><span>Bairro</span><span>${dados.bairro}</span></div>
+          <div class="obrigado-row"><span>Cidade/UF</span><span>${dados.cidade}/${dados.estado}</span></div>
+          <div class="obrigado-row"><span>CEP</span><span>${dados.cep}</span></div>
+          <div class="obrigado-row"><span>WhatsApp</span><span>${dados.whatsapp}</span></div>
+        </div>
+
+        <div class="obrigado-steps">
+          <div class="obrigado-step">
+            <div class="obrigado-step-icon">📧</div>
+            <div class="obrigado-step-text">
+              <strong>Confirmação enviada</strong>
+              Verifique seu e-mail ${dados.email}
+            </div>
+          </div>
+          <div class="obrigado-step">
+            <div class="obrigado-step-icon">📦</div>
+            <div class="obrigado-step-text">
+              <strong>Pedido em separação</strong>
+              Seu kit está sendo preparado para envio
+            </div>
+          </div>
+          <div class="obrigado-step">
+            <div class="obrigado-step-icon">🚚</div>
+            <div class="obrigado-step-text">
+              <strong>Rastreio via WhatsApp</strong>
+              Enviaremos o código de rastreio em ${dados.whatsapp}
+            </div>
+          </div>
+        </div>
+
+        <a href="https://wa.me/5531982840114?text=Ol%C3%A1%2C%20acabei%20de%20realizar%20meu%20pedido%20do%20Kit%20Premium%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es!"
+           target="_blank"
+           style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;margin-bottom:10px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Falar no WhatsApp
+        </a>
+      </div>
+    `;
+  }
+
   // Copiar PIX
   function copiarPix() {
     navigator.clipboard.writeText(pixCopiaCola).then(() => {
@@ -356,7 +441,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
         if (d.status === 'COMPLETED') {
           clearInterval(pollingInterval);
           document.getElementById('pixBox').style.display = 'none';
-          document.getElementById('pixPago').style.display = 'block';
+          mostrarObrigado();
           document.getElementById('statusDot').classList.add('pago');
         } else if (d.status === 'REJECTED' || d.status === 'CANCELLED') {
           clearInterval(pollingInterval);
@@ -381,6 +466,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#1a1a1a
     const dados = {
       nome:     document.getElementById('nome').value,
       cpf:      document.getElementById('cpf').value,
+      email:    document.getElementById('email').value,
       whatsapp: document.getElementById('whatsapp').value,
       endereco: document.getElementById('endereco').value,
       numero:   document.getElementById('numero').value,
